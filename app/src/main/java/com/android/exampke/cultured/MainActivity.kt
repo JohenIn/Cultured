@@ -27,11 +27,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 전체 화면 모드 설정 (상태바, 네비게이션바 숨김)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        controller.hide(WindowInsetsCompat.Type.systemBars())
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
+//        val controller = WindowInsetsControllerCompat(window, window.decorView)
+//        controller.systemBarsBehavior =
+//            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//        controller.hide(WindowInsetsCompat.Type.systemBars())
 
         enableEdgeToEdge()
         setContent {
