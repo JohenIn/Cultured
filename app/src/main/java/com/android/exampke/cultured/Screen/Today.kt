@@ -30,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.android.exampke.cultured.R
 
 
@@ -84,10 +83,9 @@ fun TodayScreen() {
             }
         }
         HorizontalDivider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(horizontal = 10.dp))
-        Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 10.dp)) {
+        Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 10.dp).weight(1f)) {
             Text(stringResource(id = R.string.gourds_description), fontSize = 16.sp, lineHeight = 48.sp)
         }
-        Spacer(modifier = Modifier.weight(1f))
         Box(modifier = Modifier.fillMaxWidth().padding(start = 10.dp, top = 10.dp, end = 10.dp).background(Color(0xFFE9D9D9)).height(60.dp)) {
             Text("광고삽입예정", modifier = Modifier.align(Alignment.Center))
 
