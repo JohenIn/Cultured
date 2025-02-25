@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +28,7 @@ fun NavigateScreen() {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
             "Navigate",
-            fontSize = 32.sp,
+            fontSize = 48.sp,
             fontWeight = FontWeight.ExtraBold,
             modifier = Modifier
                 .padding(horizontal = 10.dp)
@@ -78,7 +79,7 @@ fun NavigateScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
-                        .padding(vertical = 10.dp)
+                        .padding(top = 20.dp)
                         .padding(horizontal = 20.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(Color(0xFFD9D9D9))
@@ -96,6 +97,7 @@ fun NavigateScreen() {
                 }
 
             }
+            Spacer(modifier = Modifier.height(20.dp))
         }
         Box(
             modifier = Modifier

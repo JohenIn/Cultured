@@ -1,8 +1,5 @@
 package com.android.exampke.cultured
 
-import android.content.Context
-import android.os.VibrationEffect
-import android.os.Vibrator
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,8 +35,6 @@ data class NavItem(val route: String, val label: String, val icon: ImageVector)
 // 하단 네비게이션 바 컴포저블
 @Composable
 fun BottomNavBar(navController: NavController) {
-
-    val vibrate = rememberVibrate()
 
     val navItems = listOf(
         NavItem("today", "Today", Icons.Outlined.Home),
@@ -60,7 +54,6 @@ fun BottomNavBar(navController: NavController) {
         navItems.forEach { item ->
             val isSelected = currentRoute == item.route
 
-
             // NavigationBar는 Row로 구성되어 있으므로, 각 아이템에 weight를 주어 균등하게 배분합니다.
             Box(
                 modifier = Modifier
@@ -70,7 +63,6 @@ fun BottomNavBar(navController: NavController) {
                         indication = rememberRipple(bounded = true, color = Color.LightGray),
                     ) {
                         navController.navigate(item.route)
-                        vibrate()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -93,18 +85,5 @@ fun BottomNavBar(navController: NavController) {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun rememberVibrate(): () -> Unit {
-    val context = LocalContext.current
-    // context가 변경되지 않도록 remember로 묶어줍니다.
-    val vibrator = remember(context) {
-        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    }
-    return {
-        val vibrationEffect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
-        vibrator.vibrate(vibrationEffect)
     }
 }
