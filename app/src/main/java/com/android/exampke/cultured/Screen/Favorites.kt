@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
 @Composable
-fun FavoritesScreen(navController: NavController) {
+fun FavoritesScreen() {
     Box(modifier = Modifier.fillMaxSize()){
         Text(text = "Favorites", modifier = Modifier
             .align(Alignment.Center)

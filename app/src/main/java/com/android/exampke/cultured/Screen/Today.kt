@@ -11,7 +11,7 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun TodayScreen(navController: NavController) {
+fun TodayScreen() {
     Box(modifier = Modifier.fillMaxSize()){
         Text(text = "Today", modifier = Modifier
             .align(Alignment.Center)

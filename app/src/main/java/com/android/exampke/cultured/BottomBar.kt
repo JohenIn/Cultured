@@ -8,8 +8,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -20,7 +18,6 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -68,8 +65,10 @@ fun BottomNavBar(navController: NavController) {
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .clickable (interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(bounded = true, color = Color.LightGray),){
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(bounded = true, color = Color.LightGray),
+                    ) {
                         navController.navigate(item.route)
                         vibrate()
                     },

@@ -47,10 +47,10 @@ class MainActivity : ComponentActivity() {
                         startDestination = "today",
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        composable("today") { TodayScreen(navController = navController) }
-                        composable("navigate") { NavigateScreen(navController = navController) }
-                        composable("favorites") { FavoritesScreen(navController = navController) }
-                        composable("setting") { SettingScreen(navController = navController) }
+                        composable("today") { TodayScreen() }
+                        composable("navigate") { NavigateScreen() }
+                        composable("favorites") { FavoritesScreen() }
+                        composable("setting") { SettingScreen() }
                     }
                 }
             }

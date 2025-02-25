@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
 @Composable
-fun SettingScreen(navController: NavController) {
+fun SettingScreen() {
     Box(modifier = Modifier.fillMaxSize()){
         Text(text = "Setting", modifier = Modifier
             .align(Alignment.Center)

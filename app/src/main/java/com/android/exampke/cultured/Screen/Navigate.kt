@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
 @Composable
-fun NavigateScreen(navController: NavController) {
+fun NavigateScreen() {
     Box(modifier = Modifier.fillMaxSize()){
         Text(text = "Navigate", modifier = Modifier
             .align(Alignment.Center)
