@@ -49,14 +49,7 @@ import com.android.exampke.cultured.R
 fun FavoritesScreen() {
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            "Favorites",
-            fontSize = 48.sp,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .padding(top = 10.dp)
-        )
+        PageTitle("Favorites")
         var selectedOptions by remember { mutableStateOf(listOf<String>()) }
         Row(
             modifier = Modifier
@@ -252,18 +245,7 @@ fun FavoritesScreen() {
             Spacer(modifier = Modifier.height(20.dp))
 
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp)
-                .background(
-                    Color(0xFFE9D9D9)
-                )
-                .height(60.dp)
-        ) {
-            Text("광고삽입예정", modifier = Modifier.align(Alignment.Center))
-
-        }
+        AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
     }
 }
 

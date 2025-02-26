@@ -56,8 +56,11 @@ fun TodayScreen() {
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(0.62f)
-                .background(Color.White)) {
+            Column(
+                modifier = Modifier
+                    .weight(0.62f)
+                    .background(Color.White)
+            ) {
                 Text("Henri Matisse")
                 Text("French, 1869 - 1954")
                 Text("")
@@ -83,13 +86,37 @@ fun TodayScreen() {
                 }
             }
         }
-        HorizontalDivider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(horizontal = 10.dp))
-        Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 10.dp).weight(1f)) {
-            Text(stringResource(id = R.string.gourds_description), fontSize = 16.sp, lineHeight = 48.sp)
+        HorizontalDivider(
+            color = Color.LightGray,
+            thickness = 1.dp,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 10.dp)
+                .weight(1f)
+        ) {
+            Text(
+                stringResource(id = R.string.gourds_description),
+                fontSize = 16.sp,
+                lineHeight = 48.sp
+            )
         }
-        Box(modifier = Modifier.fillMaxWidth().padding(start = 10.dp, top = 10.dp, end = 10.dp).background(Color(0xFFE9D9D9)).height(60.dp)) {
-            Text("광고삽입예정", modifier = Modifier.align(Alignment.Center))
+        AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
+    }
+}
 
-        }
+@Composable
+fun AdsSection(modifier: Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth(0.95f)
+            .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
+            .background(Color(0xFFE9D9D9))
+            .height(60.dp)
+    ) {
+        Text("광고삽입예정", modifier = Modifier.align(Alignment.Center))
     }
 }

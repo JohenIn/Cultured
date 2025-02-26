@@ -28,15 +28,8 @@ import androidx.navigation.NavController
 fun SettingScreen() {
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            "Setting",
-            fontSize = 48.sp,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .padding(top = 10.dp)
-                .background(Color.White)
-        )
+        PageTitle("Setting")
+
         Spacer(modifier = Modifier.height(20.dp))
         HorizontalDivider(modifier = Modifier.padding(horizontal = 10.dp)  )
 Text("Sign In", modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp))
@@ -51,17 +44,6 @@ Text("Notification", modifier = Modifier.padding(horizontal = 20.dp, vertical = 
         HorizontalDivider(modifier = Modifier.padding(horizontal = 10.dp)  )
 
         Spacer(modifier = Modifier.weight(1f))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp)
-                .background(
-                    Color(0xFFE9D9D9)
-                )
-                .height(60.dp)
-        ) {
-            Text("광고삽입예정", modifier = Modifier.align(Alignment.Center))
-
-        }
+        AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
     }
 }

@@ -37,16 +37,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun NavigateScreen() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            "Navigate",
-            fontSize = 48.sp,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .padding(top = 10.dp)
-                .background(Color.White)
-        )
-CustomSearchBar()
+        PageTitle("Navigate")
+        CustomSearchBar()
 
         Column(
             modifier = Modifier
@@ -103,19 +95,21 @@ CustomSearchBar()
             }
             Spacer(modifier = Modifier.height(20.dp))
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp)
-                .background(
-                    Color(0xFFE9D9D9)
-                )
-                .height(60.dp)
-        ) {
-            Text("광고삽입예정", modifier = Modifier.align(Alignment.Center))
-
-        }
+        AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
     }
+}
+
+@Composable
+fun PageTitle(title: String) {
+    Text(
+        title,
+        fontSize = 48.sp,
+        fontWeight = FontWeight.ExtraBold,
+        modifier = Modifier
+            .padding(horizontal = 10.dp)
+            .padding(top = 10.dp)
+            .background(Color.White)
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
