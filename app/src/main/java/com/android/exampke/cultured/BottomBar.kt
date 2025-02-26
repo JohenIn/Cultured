@@ -1,5 +1,6 @@
 package com.android.exampke.cultured
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
@@ -21,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -49,7 +52,14 @@ fun BottomNavBar(navController: NavController) {
 
     NavigationBar(
         containerColor = Color(0xFFF0F0F0),
-        modifier = Modifier.height(50.dp)
+        modifier = Modifier
+            .height(60.dp)
+            .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
+            .border(
+                width = 0.5.dp,
+                color = Color(0xFF777777),
+                shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
+            )
     ) {
         navItems.forEach { item ->
             val isSelected = currentRoute == item.route
@@ -60,7 +70,7 @@ fun BottomNavBar(navController: NavController) {
                     .weight(1f)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(bounded = true, color = Color.LightGray),
+                        indication = rememberRipple(bounded = true, color = Color.LightGray)
                     ) {
                         navController.navigate(item.route)
                     },

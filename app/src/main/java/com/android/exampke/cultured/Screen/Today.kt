@@ -56,7 +56,8 @@ fun TodayScreen() {
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(0.62f)) {
+            Column(modifier = Modifier.weight(0.62f)
+                .background(Color.White)) {
                 Text("Henri Matisse")
                 Text("French, 1869 - 1954")
                 Text("")
