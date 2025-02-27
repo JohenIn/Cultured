@@ -41,24 +41,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import coil3.compose.AsyncImage
 import com.android.exampke.cultured.Artwork
 import com.android.exampke.cultured.R
-import com.android.exampke.cultured.fetchArtwork
+import com.android.exampke.cultured.getDailyArtwork
 
 
 @Composable
 fun TodayScreen() {
+    val context = LocalContext.current
     var artwork by remember { mutableStateOf<Artwork?>(null) }
-
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
 
-    // Firestore에서 데이터를 불러옴
+    // 오늘의 작품을 비동기로 불러옴
     LaunchedEffect(Unit) {
-        fetchArtwork { result ->
-            artwork = result
-        }
+        artwork = getDailyArtwork(context)
     }
 
     if (artwork == null) {
