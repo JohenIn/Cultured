@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.android.exampke.cultured.Screen.FavoritesScreen
 import com.android.exampke.cultured.Screen.NavigateScreen
 import com.android.exampke.cultured.Screen.SettingScreen
+import com.android.exampke.cultured.Screen.ThemeArtworksScreen
 import com.android.exampke.cultured.Screen.TodayScreen
 import com.android.exampke.cultured.ui.theme.CulturedTheme
 
@@ -48,9 +49,13 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding).navigationBarsPadding()
                         ) {
                             composable("today") { TodayScreen() }
-                            composable("navigate") { NavigateScreen() }
+                            composable("navigate") { NavigateScreen(navController = navController) }
                             composable("favorites") { FavoritesScreen() }
                             composable("setting") { SettingScreen() }
+                            composable("themeArtworks/{theme}") { backStackEntry ->
+                                val theme = backStackEntry.arguments?.getString("theme") ?: ""
+                                ThemeArtworksScreen(theme = theme)
+                            }
                         }
                     }
                 }

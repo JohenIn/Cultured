@@ -1,26 +1,20 @@
 package com.android.exampke.cultured
 
 data class Artwork(
-    val artist: Artist = Artist(),
-    val title: String = "",
-    val productionYear: String = "",
-    val material: String = "",
+    val document: String = "",
     val artType: String = "",
-    val medium: String = "",
-    val location: Location = Location(),
+    val artist_birthYear: Int = 0,
+    val artist_deathYear: Int = 0,
+    val artist_name: String = "",
+    val artist_nationality: String = "",
     val description: String = "",
-    val imageUrl: String = ""
-)
-
-data class Artist(
-    val name: String = "",
-    val nationality: String = "",
-    val birthYear: Int = 0,
-    val deathYear: Int = 0
-)
-
-data class Location(
-    val museum: String = "",
-    val city: String = "",
-    val country: String = ""
+    val imageUrl: String = "",
+    val location_city: String = "",
+    val location_country: String = "",
+    val location_museum: String = "",
+    val material: String = "",
+    val medium: String = "",
+    val productionYear: String = "",
+    val theme: String = "",
+    val title: String = ""
 )

@@ -19,8 +19,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,10 +32,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.tasks.await
 
 
 @Composable
-fun NavigateScreen() {
+fun NavigateScreen(navController: NavController) {
+    var themes by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    // Firestore에서 테마 목록을 비동기로 가져옵니다.
+    LaunchedEffect(Unit) {
+        themes = fetchUniqueThemes()
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         PageTitle("Navigate")
         CustomSearchBar()
@@ -46,31 +57,7 @@ fun NavigateScreen() {
                 .verticalScroll(rememberScrollState())
                 .weight(1f)
         ) {
-            val categories = listOf(
-                "Trending",
-                "Baroque",
-                "Bauhaus",
-                "Expressionism",
-                "Fauvism",
-                "Impressionism",
-                "Pop Art",
-                "Realism",
-                "Renaissance",
-                "Romanticism",
-                "Surrealism",
-                "Symbolism",
-                "Abstract",
-                "Art Nouveau",
-                "Cubism",
-                "Dadaism",
-                "Minimalism",
-                "Post-Impressionism",
-                "Pre-Raphaelite",
-                "Rococo",
-                "Ukiyo-e"
-            )
-
-            for (category in categories) {
+            themes.forEach { theme ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -79,10 +66,13 @@ fun NavigateScreen() {
                         .padding(horizontal = 20.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(Color(0xFFD9D9D9))
-                        .clickable {}
+                        .clickable {
+                            navController.navigate("themeArtworks/$theme")
+
+                        }
                 ) {
                     Text(
-                        category,
+                        theme,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(15.dp),
@@ -129,7 +119,7 @@ fun CustomSearchBar() {
             .fillMaxWidth()
             .padding(horizontal = 10.dp),
         placeholder = {
-            Text("Artist, Title, Art Type or whatever you want")
+            Text("Artist, Title, Art Type or Whatever you want")
         },
         trailingIcon = {
             Icon(
@@ -144,4 +134,12 @@ fun CustomSearchBar() {
     ) {
         // 여기에 검색 제안 등 추가 콘텐츠를 넣을 수 있습니다.
     }
+}
+
+suspend fun fetchUniqueThemes(): List<String> {
+    val db = Firebase.firestore
+    val snapshot = db.collection("artworks").get().await()
+
+    // 각 문서의 "theme" 필드를 가져오고, null이 아닌 값들을 모아서 distinct 처리합니다.
+    return snapshot.documents.mapNotNull { it.getString("theme") }.distinct()
 }

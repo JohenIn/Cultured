@@ -34,10 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.android.exampke.cultured.Artwork
 import com.android.exampke.cultured.R
@@ -47,6 +50,9 @@ import com.android.exampke.cultured.fetchArtwork
 @Composable
 fun TodayScreen() {
     var artwork by remember { mutableStateOf<Artwork?>(null) }
+
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
 
     // Firestore에서 데이터를 불러옴
     LaunchedEffect(Unit) {
@@ -67,15 +73,16 @@ fun TodayScreen() {
             // 이미지 영역 (AsyncImage로 Firestore의 imageUrl 사용)
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 10.dp, vertical = 10.dp)
+                    .heightIn(max = screenHeight / 3)
                     .clip(RoundedCornerShape(10.dp))
-                    .border(width = 2.dp, color = Color.Black, shape = RoundedCornerShape(10.dp))
+                    .border(width = 1.dp, color = Color.LightGray, shape = RoundedCornerShape(10.dp))
             ) {
                 AsyncImage(
                     model = artwork!!.imageUrl,
                     contentDescription = "Image of the art",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit // 이미지 비율에 맞춰 채우기
                 )
             }
             // 작품 정보 영역
@@ -90,9 +97,9 @@ fun TodayScreen() {
                         .weight(0.62f)
                         .background(Color.White)
                 ) {
-                    Text(text = artwork!!.artist.name, fontSize = 16.sp)
+                    Text(text = artwork!!.artist_name, fontSize = 16.sp)
                     Text(
-                        text = "${artwork!!.artist.nationality}, ${artwork!!.artist.birthYear} - ${artwork!!.artist.deathYear}",
+                        text = "${artwork!!.artist_nationality}, ${artwork!!.artist_birthYear} - ${artwork!!.artist_deathYear}",
                         fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -108,11 +115,11 @@ fun TodayScreen() {
                     Text(text = artwork!!.medium, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(4.dp))
                     Row {
-                        Text(text = artwork!!.location.museum, fontSize = 14.sp)
+                        Text(text = artwork!!.location_museum, fontSize = 14.sp)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = artwork!!.location.city, fontSize = 14.sp)
+                        Text(text = artwork!!.location_city, fontSize = 14.sp)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = artwork!!.location.country, fontSize = 14.sp)
+                        Text(text = artwork!!.location_country, fontSize = 14.sp)
                     }
                     Row {
                         Text(text = "1,456", fontSize = 14.sp)
