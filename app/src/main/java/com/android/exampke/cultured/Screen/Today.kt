@@ -63,6 +63,7 @@ fun TodayScreen() {
     } else {
         // 데이터가 불러와졌다면 화면 구성
         Column(modifier = Modifier.fillMaxSize()) {
+            PageTitle(artwork!!.title)
             // 이미지 영역 (AsyncImage로 Firestore의 imageUrl 사용)
             Box(
                 modifier = Modifier
@@ -155,7 +156,7 @@ fun TodayScreen() {
                 )
             }
             // 광고 영역 (예시)
-            AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
+//            AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
     }
 }
