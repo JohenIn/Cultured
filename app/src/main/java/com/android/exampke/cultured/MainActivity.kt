@@ -5,8 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,31 +29,29 @@ import com.android.exampke.cultured.ui.theme.CulturedTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 전체 화면 모드 설정 (상태바, 네비게이션바 숨김)
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
-//        val controller = WindowInsetsControllerCompat(window, window.decorView)
-//        controller.systemBarsBehavior =
-//            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//        controller.hide(WindowInsetsCompat.Type.systemBars())
 
         enableEdgeToEdge()
         setContent {
             CulturedTheme {
-                // NavController 생성
-                val navController = rememberNavController()
-                Scaffold(
+                Surface(
                     modifier = Modifier.fillMaxSize(),
-                    bottomBar = { BottomNavBar(navController = navController) }
-                ) { innerPadding ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = "today",
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
-                        composable("today") { TodayScreen() }
-                        composable("navigate") { NavigateScreen() }
-                        composable("favorites") { FavoritesScreen() }
-                        composable("setting") { SettingScreen() }
+                    color = MaterialTheme.colorScheme.background
+                ){// NavController 생성
+                    val navController = rememberNavController()
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        bottomBar = { BottomNavBar(navController = navController) }
+                    ) { innerPadding ->
+                        NavHost(
+                            navController = navController,
+                            startDestination = "today",
+                            modifier = Modifier.padding(innerPadding).navigationBarsPadding()
+                        ) {
+                            composable("today") { TodayScreen() }
+                            composable("navigate") { NavigateScreen() }
+                            composable("favorites") { FavoritesScreen() }
+                            composable("setting") { SettingScreen() }
+                        }
                     }
                 }
             }

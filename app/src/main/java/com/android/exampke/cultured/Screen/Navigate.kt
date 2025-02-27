@@ -108,7 +108,6 @@ fun PageTitle(title: String) {
         modifier = Modifier
             .padding(horizontal = 10.dp)
             .padding(top = 10.dp)
-            .background(Color.White)
     )
 }
 
