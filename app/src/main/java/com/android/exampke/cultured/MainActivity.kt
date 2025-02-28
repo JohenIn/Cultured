@@ -10,13 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -38,7 +32,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
-                ){// NavController 생성
+                ) {// NavController 생성
                     val navController = rememberNavController()
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
@@ -47,7 +41,9 @@ class MainActivity : ComponentActivity() {
                         NavHost(
                             navController = navController,
                             startDestination = "today",
-                            modifier = Modifier.padding(innerPadding).navigationBarsPadding()
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .navigationBarsPadding()
                         ) {
                             composable("today") { TodayScreen() }
                             composable("navigate") { NavigateScreen(navController = navController) }
@@ -58,8 +54,12 @@ class MainActivity : ComponentActivity() {
                                 ThemeArtworksScreen(theme = theme, navController = navController)
                             }
                             composable("artworkInformation/{artworkId}") { backStackEntry ->
-                                val artworkId = backStackEntry.arguments?.getString("artworkId") ?: ""
-                                ArtworkInformationScreen(artworkId = artworkId, navController = navController)
+                                val artworkId =
+                                    backStackEntry.arguments?.getString("artworkId") ?: ""
+                                ArtworkInformationScreen(
+                                    artworkId = artworkId,
+                                    navController = navController
+                                )
                             }
                         }
                     }

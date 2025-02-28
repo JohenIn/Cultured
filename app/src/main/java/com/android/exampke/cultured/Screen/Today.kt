@@ -164,9 +164,6 @@ fun ArtworkDetails(
 
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-
         }     // 구분선
         HorizontalDivider(
             color = Color.LightGray,
@@ -191,8 +188,8 @@ fun ArtworkDetails(
             Spacer(modifier = Modifier.height(20.dp))
         }
         if (showAds) {
-//         광고 영역 (예시)
-            AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))}
+            AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
+        }
     }
 }
 
