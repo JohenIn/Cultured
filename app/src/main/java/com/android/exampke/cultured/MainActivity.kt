@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.android.exampke.cultured.Screen.ArtworkInformationScreen
 import com.android.exampke.cultured.Screen.FavoritesScreen
 import com.android.exampke.cultured.Screen.NavigateScreen
 import com.android.exampke.cultured.Screen.SettingScreen
@@ -54,7 +55,11 @@ class MainActivity : ComponentActivity() {
                             composable("setting") { SettingScreen() }
                             composable("themeArtworks/{theme}") { backStackEntry ->
                                 val theme = backStackEntry.arguments?.getString("theme") ?: ""
-                                ThemeArtworksScreen(theme = theme)
+                                ThemeArtworksScreen(theme = theme, navController = navController)
+                            }
+                            composable("artworkInformation/{artworkId}") { backStackEntry ->
+                                val artworkId = backStackEntry.arguments?.getString("artworkId") ?: ""
+                                ArtworkInformationScreen(artworkId = artworkId, navController = navController)
                             }
                         }
                     }

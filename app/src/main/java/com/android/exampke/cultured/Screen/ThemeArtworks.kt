@@ -1,5 +1,6 @@
 package com.android.exampke.cultured.Screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,11 +14,12 @@ import com.android.exampke.cultured.Artwork
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import androidx.compose.ui.Alignment
+import androidx.navigation.NavController
 
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun ThemeArtworksScreen(theme: String) {
+fun ThemeArtworksScreen(theme: String, navController: NavController,) {
     var artworks by remember { mutableStateOf<List<Artwork>>(emptyList()) }
 
     // 테마가 바뀔 때마다 Firestore에서 데이터를 불러옴
@@ -33,7 +35,11 @@ fun ThemeArtworksScreen(theme: String) {
             items(artworks) { artwork ->
                 Row(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)) {
+                    .padding(vertical = 8.dp)
+                    .clickable {
+                        // 선택된 artwork의 document 필드를 route 파라미터로 전달
+                        navController.navigate("artworkInformation/${artwork.document}")
+                    }) {
                     AsyncImage(
                         model = artwork.imageUrl,
                         contentDescription = artwork.title,
