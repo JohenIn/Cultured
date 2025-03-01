@@ -3,8 +3,8 @@ package com.android.exampke.cultured
 data class Artwork(
     val document: String = "",
     val artType: String = "",
-    val artist_birthYear: Int = 0,
-    val artist_deathYear: Int = 0,
+    val artist_birthYear: String = "",
+    val artist_deathYear: String = "",
     val artist_name: String = "",
     val artist_nationality: String = "",
     val description: String = "",

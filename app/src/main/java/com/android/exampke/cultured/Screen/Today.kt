@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.android.exampke.cultured.Artwork
 import com.android.exampke.cultured.getDailyArtwork
+import com.android.exampke.cultured.ui.theme.ArtworkDetails
 
 
 @Composable
@@ -66,130 +67,6 @@ fun TodayScreen() {
     } else {
         // 데이터가 불러와졌다면 화면 구성
         ArtworkDetails(screenHeight, artwork, false)
-    }
-}
-
-@Composable
-fun ArtworkDetails(
-    screenHeight: Dp,
-    artwork: Artwork?,
-    showAds: Boolean = true
-) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        // 이미지 영역 (AsyncImage로 Firestore의 imageUrl 사용)
-        Box(
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp, end = 10.dp)
-                .heightIn(max = screenHeight / 3)
-                .clip(RoundedCornerShape(10.dp))
-                .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                    shape = RoundedCornerShape(10.dp)
-                )
-        ) {
-            AsyncImage(
-                model = artwork!!.imageUrl,
-                contentDescription = "Image of the art",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit // 이미지 비율에 맞춰 채우기
-            )
-        }
-        // 작품 정보 영역
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .height(IntrinsicSize.Max),
-        ) {
-
-            Text(
-                text = artwork!!.title,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    text = artwork!!.artist_name,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "(${artwork!!.artist_birthYear}-${artwork!!.artist_deathYear}, ${artwork!!.artist_nationality})",
-                    fontSize = 16.sp
-                )
-            }
-            Text(text = artwork!!.material, fontSize = 16.sp)
-            Text(text = artwork!!.productionYear, fontSize = 16.sp)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            Text("Department", fontSize = 16.sp, color = Color.Gray)
-            Text(text = artwork!!.artType, fontSize = 16.sp)
-            Text("Medium", fontSize = 16.sp, color = Color.Gray)
-            Text(text = artwork!!.medium, fontSize = 16.sp)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text("Location", fontSize = 16.sp, color = Color.Gray)
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = artwork!!.location_museum,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Text(
-                    text = ", ${artwork!!.location_city}, ${artwork!!.location_country}",
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(text = "1,456", fontSize = 14.sp)
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Outlined.Share,
-                    contentDescription = "Share",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-
-
-            }
-
-        }     // 구분선
-        HorizontalDivider(
-            color = Color.LightGray,
-            modifier = Modifier.padding(horizontal = 15.dp)
-        )
-
-        // 설명 영역 (스크롤 가능)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 10.dp)
-                .weight(1f)
-        ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = artwork!!.description,
-                fontSize = 16.sp,
-                lineHeight = 24.sp
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-        if (showAds) {
-            AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
-        }
     }
 }
 

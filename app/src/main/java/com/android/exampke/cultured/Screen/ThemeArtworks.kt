@@ -27,7 +27,9 @@ fun ThemeArtworksScreen(theme: String, navController: NavController,) {
         artworks = fetchArtworksByTheme(theme)
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
         Text(text = "Theme: $theme", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -44,13 +46,25 @@ fun ThemeArtworksScreen(theme: String, navController: NavController,) {
                         model = artwork.imageUrl,
                         contentDescription = artwork.title,
                         modifier = Modifier.size(100.dp)
+                            .align(Alignment.Top),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = artwork.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
+                    Column(){
+                        Text(
+                            text = artwork.title,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            text = artwork.artist_name,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Row(){
+                            Text(
+                                text = "${artwork.location_city}, ${artwork.location_country}",
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                    }
                 }
             }
         }
