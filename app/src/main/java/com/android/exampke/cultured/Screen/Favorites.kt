@@ -135,7 +135,11 @@ fun FavoritesScreen(navController: NavController) {
             ) {
                 Text(
                     text = "Log In to set your favorites",
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .clickable {
+                            navController.navigate("login")
+                        }
                 )
             }
 

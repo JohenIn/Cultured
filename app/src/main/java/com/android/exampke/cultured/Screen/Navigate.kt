@@ -29,10 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -58,30 +60,7 @@ fun NavigateScreen(navController: NavController) {
                 .weight(1f)
         ) {
             themes.forEach { theme ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(top = 20.dp)
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFD9D9D9))
-                        .clickable {
-                            navController.navigate("themeArtworks/$theme")
-
-                        }
-                ) {
-                    Text(
-                        theme,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(15.dp),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
-                    )
-                }
-
+                ThemeBox(theme = theme, navController = navController)
             }
             Spacer(modifier = Modifier.height(20.dp))
         }
@@ -142,4 +121,56 @@ suspend fun fetchUniqueThemes(): List<String> {
 
     // 각 문서의 "theme" 필드를 가져오고, null이 아닌 값들을 모아서 distinct 처리합니다.
     return snapshot.documents.mapNotNull { it.getString("theme") }.distinct()
+}
+
+suspend fun fetchRandomArtworkImageByTheme(theme: String): String? {
+    val db = Firebase.firestore
+    val snapshot = db.collection("artworks")
+        .whereEqualTo("theme", theme)
+        .get()
+        .await()
+    return snapshot.documents.randomOrNull()?.getString("imageUrl")
+}
+
+@Composable
+fun ThemeBox(theme: String, navController: NavController) {
+    var imageUrl by remember { mutableStateOf<String?>(null) }
+
+    // 테마가 바뀔 때마다 랜덤 이미지를 불러옴
+    LaunchedEffect(theme) {
+        imageUrl = fetchRandomArtworkImageByTheme(theme)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp)
+            .padding(top = 20.dp)
+            .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color(0xFFD9D9D9)) // 이미지가 로드되지 않으면 fallback 배경
+            .clickable {
+                navController.navigate("themeArtworks/$theme")
+            }
+    ) {
+        // 이미지가 있으면 배경으로 채워넣기 (Crop 처리하여 박스 크기에 맞게)
+        if (imageUrl != null) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = theme,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        // 테마 이름 표시
+        Text(
+            text = theme,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(15.dp),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color.White
+        )
+    }
 }
