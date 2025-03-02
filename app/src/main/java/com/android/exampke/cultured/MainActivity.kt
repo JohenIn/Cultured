@@ -22,10 +22,12 @@ import com.android.exampke.cultured.Screen.SettingScreen
 import com.android.exampke.cultured.Screen.ThemeArtworksScreen
 import com.android.exampke.cultured.Screen.TodayScreen
 import com.android.exampke.cultured.ui.theme.CulturedTheme
+import com.google.android.gms.ads.MobileAds
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this) {}
 
         enableEdgeToEdge()
         setContent {

@@ -27,8 +27,14 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        //Firebase App Key
         val defaultWebClientId = localProperties.getProperty("DEFAULT_WEB_CLIENT_ID", "")
         buildConfigField("String", "DEFAULT_WEB_CLIENT_ID", "\"$defaultWebClientId\"")
+
+        //구글 애드 광고 ID
+        val googleAdmobAppId = localProperties.getProperty("GOOGLE_ADMOB_APP_ID", "")
+        buildConfigField("String", "GOOGLE_ADMOB_APP_ID", "\"$googleAdmobAppId\"")
+        manifestPlaceholders["GOOGLE_ADMOB_APP_ID"] = googleAdmobAppId
 
     }
 
@@ -100,4 +106,7 @@ dependencies {
     //Coil
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+
+    //배너 광고
+    implementation("com.google.android.gms:play-services-ads:24.0.0")
 }
