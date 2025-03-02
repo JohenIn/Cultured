@@ -31,7 +31,7 @@ fun ArtworkInformationScreen(artworkId: String, navController: NavController) {
     if (artwork == null) {
         CircularProgressIndicator()
     } else {
-        ArtworkDetails(screenHeight, artwork)
+        ArtworkDetails(screenHeight, artwork, navController = navController)
     }
 
 }

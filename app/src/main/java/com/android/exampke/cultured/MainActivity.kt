@@ -46,9 +46,9 @@ class MainActivity : ComponentActivity() {
                                 .padding(innerPadding)
                                 .navigationBarsPadding()
                         ) {
-                            composable("today") { TodayScreen() }
+                            composable("today") { TodayScreen(navController = navController) }
                             composable("navigate") { NavigateScreen(navController = navController) }
-                            composable("favorites") { FavoritesScreen() }
+                            composable("favorites") { FavoritesScreen(navController = navController) }
                             composable("setting") { SettingScreen(navController = navController) }
                             composable("themeArtworks/{theme}") { backStackEntry ->
                                 val theme = backStackEntry.arguments?.getString("theme") ?: ""
