@@ -5,6 +5,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+
+    //Room
+    id("com.google.devtools.ksp")
 }
 
 val localProperties = Properties().apply {
@@ -109,4 +112,12 @@ dependencies {
 
     //배너 광고
     implementation("com.google.android.gms:play-services-ads:24.0.0")
+
+    //Room
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-ktx:$room_version")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 }

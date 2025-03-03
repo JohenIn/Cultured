@@ -332,7 +332,6 @@ fun FavoritesScreen(navController: NavController) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
                         .verticalColumnScrollbar(rememberScrollState)
                         .verticalScroll(rememberScrollState)
                         .weight(1f)
@@ -340,13 +339,12 @@ fun FavoritesScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(20.dp))
                     filteredFavorites.forEach { artwork ->
                         // 각 Row에 클릭 가능한 영역을 추가하여 상세 화면으로 이동
-
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(IntrinsicSize.Max)
                                 .clip(RoundedCornerShape(10.dp))
+                                .padding(horizontal = 20.dp)
                                 .border(
                                     width = 0.5.dp,
                                     color = Color(0xFFD9D9D9),
@@ -419,42 +417,8 @@ fun FavoritesScreen(navController: NavController) {
                             }
                         }
                         Spacer(modifier = Modifier.height(20.dp))
-
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .border(
-                                width = 0.5.dp,
-                                color = Color(0xFFD9D9D9),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.gourds),
-                            contentDescription = "image of the art",
-                        )
-                        Column(modifier = Modifier.padding(start = 15.dp, top = 15.dp)) {
-                            Text(
-                                "Gourds",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.Black,
-                            )
-                            Text(
-                                "Henri Matisse",
-                                fontSize = 16.sp,
-                                color = Color.Black,
-                            )
-                            Text("Painting", fontSize = 16.sp, color = Color.Black)
-                            Text("Oil painting", fontSize = 16.sp, color = Color.Black)
-                            Text("MoMA, NY, US", fontSize = 16.sp, color = Color.Black)
-                        }
                     }
                 }
-
             }
         }
         AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
