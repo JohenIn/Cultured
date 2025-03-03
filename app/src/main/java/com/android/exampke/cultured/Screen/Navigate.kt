@@ -57,7 +57,9 @@ fun NavigateScreen(navController: NavController) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         PageTitle("Navigate")
-        CustomSearchBar()
+
+        //Firebase는 검색이 용이하지 않으므로 다른 대안을 생각해보아야한다.
+        //CustomSearchBar()
 
         val rememberScrollState = rememberScrollState()
         Column(
