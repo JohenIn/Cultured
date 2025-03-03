@@ -327,12 +327,15 @@ fun FavoritesScreen(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 // 즐겨찾기 목록 표시
+
+                val rememberScrollState = rememberScrollState()
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
+                        .verticalColumnScrollbar(rememberScrollState)
+                        .verticalScroll(rememberScrollState)
                         .weight(1f)
-                        .verticalScroll(rememberScrollState())
                 ) {
                     Spacer(modifier = Modifier.height(20.dp))
                     filteredFavorites.forEach { artwork ->
