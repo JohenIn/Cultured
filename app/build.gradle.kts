@@ -120,4 +120,7 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+    //GSON
+    implementation("com.google.code.gson:gson:2.8.8")
 }

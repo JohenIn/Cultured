@@ -1,5 +1,6 @@
 package com.android.exampke.cultured.Screen
 
+import android.content.Context
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +38,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -44,17 +46,25 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.android.exampke.cultured.repository.rememberUniqueThemes
+import com.google.common.reflect.TypeToken
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
 fun NavigateScreen(navController: NavController) {
-    // 테마 목록과 대표 이미지를 한 번에 구독합니다.
+    // 캐싱된 테마별 대표 이미지 Map 구독
     val themeImageMapState = rememberThemeRepresentativeImages()
     val themeImageMap = themeImageMapState.value
-    // Map의 키 목록이 곧 테마 목록입니다.
+    // Map의 키가 테마 목록이 됨
     val themes = themeImageMap.keys.toList()
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -130,36 +140,42 @@ fun CustomSearchBar() {
 @Composable
 fun rememberThemeRepresentativeImages(): State<Map<String, String>> {
     val themeImageMapState = remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    val context = LocalContext.current
     val db = Firebase.firestore
 
     DisposableEffect(Unit) {
         val registration = db.collection("artworks")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    // 에러 처리 (필요 시 로깅 등)
+                    // 에러 처리 (필요 시 로깅)
                     return@addSnapshotListener
                 }
                 snapshot?.let { snap ->
-                    // 각 문서에서 theme과 imageUrl이 존재하는 데이터만 가져와서 (theme, imageUrl) 쌍으로 만듭니다.
+                    // 각 문서에서 theme과 imageUrl이 존재하는 데이터만 추출
                     val pairs = snap.documents.mapNotNull { doc ->
                         val theme = doc.getString("theme")
                         val imageUrl = doc.getString("imageUrl")
                         if (theme != null && imageUrl != null) {
                             theme to imageUrl
-                        } else {
-                            null
-                        }
+                        } else null
                     }
-                    // 같은 테마별로 그룹화합니다.
+                    // 같은 테마별로 그룹화
                     val grouped: Map<String, List<String>> = pairs.groupBy(
                         keySelector = { it.first },
                         valueTransform = { it.second }
                     )
-                    // 각 테마 그룹에서 랜덤으로 하나의 imageUrl을 선택합니다.
-                    val representativeMap = grouped.mapValues { entry ->
+                    // 각 테마 그룹에서 랜덤으로 하나의 imageUrl 선택
+                    val freshMap = grouped.mapValues { entry ->
                         entry.value.randomOrNull() ?: ""
                     }
-                    themeImageMapState.value = representativeMap
+                    // CoroutineScope를 사용해 백그라운드에서 캐싱 처리
+                    kotlinx.coroutines.CoroutineScope(Dispatchers.IO).launch {
+                        val dailyMap = getDailyThemeRepresentativeImages(context, freshMap)
+                        // 메인 스레드에서 상태 업데이트
+                        withContext(Dispatchers.Main) {
+                            themeImageMapState.value = dailyMap
+                        }
+                    }
                 }
             }
         onDispose {
@@ -167,6 +183,28 @@ fun rememberThemeRepresentativeImages(): State<Map<String, String>> {
         }
     }
     return themeImageMapState
+}
+
+suspend fun getDailyThemeRepresentativeImages(
+    context: Context,
+    freshMap: Map<String, String>
+): Map<String, String> {
+    val prefs = context.getSharedPreferences("daily_theme", Context.MODE_PRIVATE)
+    val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    val savedDate = prefs.getString("date", null)
+    val savedJson = prefs.getString("theme_map", null)
+    return if (savedDate == todayDate && savedJson != null) {
+        // 저장된 JSON을 Map으로 복원
+        val type = object : TypeToken<Map<String, String>>() {}.type
+        Gson().fromJson(savedJson, type)
+    } else {
+        // 오늘 날짜로 freshMap을 저장
+        val json = Gson().toJson(freshMap)
+        prefs.edit().putString("date", todayDate)
+            .putString("theme_map", json)
+            .apply()
+        freshMap
+    }
 }
 
 @Composable
@@ -184,7 +222,7 @@ fun ThemeBox(theme: String, imageUrl: String?, navController: NavController) {
             }
     ) {
         // 이미지가 있으면 배경으로 채워넣기 (Crop 처리하여 박스 크기에 맞게)
-        if (imageUrl != null) {
+        if (!imageUrl.isNullOrEmpty()) {
             AsyncImage(
                 model = imageUrl,
                 contentDescription = theme,
