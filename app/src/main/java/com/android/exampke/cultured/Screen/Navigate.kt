@@ -21,7 +21,9 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.android.exampke.cultured.repository.rememberUniqueThemes
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -48,12 +51,11 @@ import kotlinx.coroutines.tasks.await
 
 @Composable
 fun NavigateScreen(navController: NavController) {
-    var themes by remember { mutableStateOf<List<String>>(emptyList()) }
-
-    // Firestore에서 테마 목록을 비동기로 가져옵니다.
-    LaunchedEffect(Unit) {
-        themes = fetchUniqueThemes()
-    }
+    // 테마 목록과 대표 이미지를 한 번에 구독합니다.
+    val themeImageMapState = rememberThemeRepresentativeImages()
+    val themeImageMap = themeImageMapState.value
+    // Map의 키 목록이 곧 테마 목록입니다.
+    val themes = themeImageMap.keys.toList()
 
     Column(modifier = Modifier.fillMaxSize()) {
         PageTitle("Navigate")
@@ -70,7 +72,7 @@ fun NavigateScreen(navController: NavController) {
                 .weight(1f)
         ) {
             themes.forEach { theme ->
-                ThemeBox(theme = theme, navController = navController)
+                ThemeBox(theme = theme, imageUrl = themeImageMap[theme], navController = navController)
             }
             Spacer(modifier = Modifier.height(20.dp))
         }
@@ -125,32 +127,50 @@ fun CustomSearchBar() {
     }
 }
 
-suspend fun fetchUniqueThemes(): List<String> {
+@Composable
+fun rememberThemeRepresentativeImages(): State<Map<String, String>> {
+    val themeImageMapState = remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     val db = Firebase.firestore
-    val snapshot = db.collection("artworks").get().await()
 
-    // 각 문서의 "theme" 필드를 가져오고, null이 아닌 값들을 모아서 distinct 처리합니다.
-    return snapshot.documents.mapNotNull { it.getString("theme") }.distinct()
-}
-
-suspend fun fetchRandomArtworkImageByTheme(theme: String): String? {
-    val db = Firebase.firestore
-    val snapshot = db.collection("artworks")
-        .whereEqualTo("theme", theme)
-        .get()
-        .await()
-    return snapshot.documents.randomOrNull()?.getString("imageUrl")
+    DisposableEffect(Unit) {
+        val registration = db.collection("artworks")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    // 에러 처리 (필요 시 로깅 등)
+                    return@addSnapshotListener
+                }
+                snapshot?.let { snap ->
+                    // 각 문서에서 theme과 imageUrl이 존재하는 데이터만 가져와서 (theme, imageUrl) 쌍으로 만듭니다.
+                    val pairs = snap.documents.mapNotNull { doc ->
+                        val theme = doc.getString("theme")
+                        val imageUrl = doc.getString("imageUrl")
+                        if (theme != null && imageUrl != null) {
+                            theme to imageUrl
+                        } else {
+                            null
+                        }
+                    }
+                    // 같은 테마별로 그룹화합니다.
+                    val grouped: Map<String, List<String>> = pairs.groupBy(
+                        keySelector = { it.first },
+                        valueTransform = { it.second }
+                    )
+                    // 각 테마 그룹에서 랜덤으로 하나의 imageUrl을 선택합니다.
+                    val representativeMap = grouped.mapValues { entry ->
+                        entry.value.randomOrNull() ?: ""
+                    }
+                    themeImageMapState.value = representativeMap
+                }
+            }
+        onDispose {
+            registration.remove()
+        }
+    }
+    return themeImageMapState
 }
 
 @Composable
-fun ThemeBox(theme: String, navController: NavController) {
-    var imageUrl by remember { mutableStateOf<String?>(null) }
-
-    // 테마가 바뀔 때마다 랜덤 이미지를 불러옴
-    LaunchedEffect(theme) {
-        imageUrl = fetchRandomArtworkImageByTheme(theme)
-    }
-
+fun ThemeBox(theme: String, imageUrl: String?, navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -184,7 +204,6 @@ fun ThemeBox(theme: String, navController: NavController) {
         )
     }
 }
-
 
 @Composable
 fun Modifier.verticalColumnScrollbar(

@@ -1,7 +1,6 @@
 package com.android.exampke.cultured.Screen
 
 import android.content.Context
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,24 +24,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.android.exampke.cultured.Artwork
-import com.android.exampke.cultured.getDailyArtwork
+import com.android.exampke.cultured.repository.getDailyArtworkFromList
+import com.android.exampke.cultured.repository.rememberArtworks
 import com.android.exampke.cultured.ui.theme.ArtworkDetails
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 
-
 @Composable
 fun TodayScreen(navController: NavController) {
     val context = LocalContext.current
+    val artworks by rememberArtworks()
     var artwork by remember { mutableStateOf<Artwork?>(null) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
 
-    // 오늘의 작품을 비동기로 불러옴
-    LaunchedEffect(Unit) {
-        artwork = getDailyArtwork(context)
+    // 전체 artworks 목록이 준비되면 오늘의 artwork 선택 (재조회 없이 캐시된 데이터 사용)
+    LaunchedEffect(artworks) {
+        if (artworks.isNotEmpty()) {
+            artwork = getDailyArtworkFromList(artworks, context)
+        }
     }
 
     if (artwork == null) {
