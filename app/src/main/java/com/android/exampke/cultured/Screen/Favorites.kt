@@ -336,7 +336,6 @@ fun FavoritesScreen(navController: NavController) {
                         .verticalScroll(rememberScrollState)
                         .weight(1f)
                 ) {
-                    Spacer(modifier = Modifier.height(20.dp))
                     filteredFavorites.forEach { artwork ->
                         // 각 Row에 클릭 가능한 영역을 추가하여 상세 화면으로 이동
                         Row(
@@ -378,7 +377,16 @@ fun FavoritesScreen(navController: NavController) {
                                     contentDescription = artwork.title,
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .align(Alignment.Center),
+                                        .align(Alignment.Center)
+                                        .clip(
+                                            RoundedCornerShape(
+                                                topStart = 10.dp,
+                                                topEnd = 0.dp,
+                                                bottomEnd = 0.dp,
+                                                bottomStart = 10.dp
+                                            )
+                                        )
+                                    ,
                                     contentScale = ContentScale.Fit // 원본 비율을 유지하며 최대한 꽉 채움
                                 )
                             }

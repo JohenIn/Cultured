@@ -42,16 +42,15 @@ fun ThemeArtworksScreen(theme: String, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
     ) {
-        Text(text = "Theme: $theme", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+        PageTitle(theme)
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+
+        LazyColumn(modifier = Modifier.fillMaxSize().weight(1f)) {
             items(artworks) { artwork ->
                 Row(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(horizontal = 20.dp)
                     .clickable {
                         // 선택된 artwork의 document 필드를 route 파라미터로 전달
                         navController.navigate("artworkInformation/${artwork.document}")
@@ -83,6 +82,7 @@ fun ThemeArtworksScreen(theme: String, navController: NavController) {
                 }
             }
         }
+        AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
     }
 }
 
