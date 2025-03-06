@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -91,10 +92,10 @@ fun NavigateScreen(navController: NavController) {
 }
 
 @Composable
-fun PageTitle(title: String) {
+fun PageTitle(title: String, fontSize: TextUnit = 48.sp) {
     Text(
         title,
-        fontSize = 48.sp,
+        fontSize = fontSize,
         fontWeight = FontWeight.ExtraBold,
         modifier = Modifier
             .padding(horizontal = 10.dp)

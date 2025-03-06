@@ -47,6 +47,7 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.android.exampke.cultured.Artwork
 import com.android.exampke.cultured.R
+import com.android.exampke.cultured.ui.theme.ArtworksCard
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
@@ -338,92 +339,7 @@ fun FavoritesScreen(navController: NavController) {
                 ) {
                     filteredFavorites.forEach { artwork ->
                         // 각 Row에 클릭 가능한 영역을 추가하여 상세 화면으로 이동
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(IntrinsicSize.Max)
-                                .clip(RoundedCornerShape(10.dp))
-                                .padding(horizontal = 20.dp)
-                                .border(
-                                    width = 0.5.dp,
-                                    color = Color(0xFFD9D9D9),
-                                    shape = RoundedCornerShape(10.dp)
-                                )
-                                .clickable {
-                                    navController.navigate("artworkInformation/${artwork.document}")
-                                }
-                        ) {
-                            // 이미지 영역: 전체 너비의 50%를 차지, 높이는 텍스트 영역에 맞춰짐
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight()
-                                    .drawBehind {
-                                        val strokeWidth = 0.5.dp.toPx()
-                                        // 오른쪽 경계에 선 그리기
-                                        drawLine(
-                                            color = Color(0xFFD9D9D9),
-                                            start = Offset(x = size.width + strokeWidth, y = 0f),
-                                            end = Offset(
-                                                x = size.width + strokeWidth,
-                                                y = size.height
-                                            ),
-                                            strokeWidth = strokeWidth
-                                        )
-                                    }
-                            ) {
-                                AsyncImage(
-                                    model = artwork.imageUrl,
-                                    contentDescription = artwork.title,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .align(Alignment.Center)
-                                        .clip(
-                                            RoundedCornerShape(
-                                                topStart = 10.dp,
-                                                topEnd = 0.dp,
-                                                bottomEnd = 0.dp,
-                                                bottomStart = 10.dp
-                                            )
-                                        )
-                                    ,
-                                    contentScale = ContentScale.Fit // 원본 비율을 유지하며 최대한 꽉 채움
-                                )
-                            }
-                            // 텍스트 영역: 나머지 50%를 차지하며, 텍스트가 줄바꿈될 경우 Row의 높이가 이에 맞게 증가됨
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 15.dp, top = 15.dp)
-                            ) {
-                                Text(
-                                    text = artwork.title,
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = artwork.artist_name,
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = artwork.artType,
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = artwork.medium,
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "${artwork.location_museum}, ${artwork.location_city}, ${artwork.location_country}",
-                                    fontSize = 16.sp,
-                                    color = Color.Black
-                                )
-                            }
-                        }
+                        ArtworksCard(navController, artwork)
                         Spacer(modifier = Modifier.height(20.dp))
                     }
                 }
@@ -432,6 +348,7 @@ fun FavoritesScreen(navController: NavController) {
         AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
     }
 }
+
 
 @Composable
 fun ExpandableFilter(
@@ -474,7 +391,24 @@ fun ExpandableFilter(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .padding(horizontal = 40.dp)
+                .fillMaxWidth()
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 0.dp,
+                        topEnd = 0.dp,
+                        bottomEnd = 10.dp,
+                        bottomStart = 10.dp
+                    )
+                )
+                .background(Color(0xFFF0F0F0))
+                .border(
+                    width = 0.5.dp,
+                    color = Color(0xFF777777),
+                    shape = RoundedCornerShape(bottomEnd = 10.dp,
+                        bottomStart = 10.dp)
+                )
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
@@ -494,7 +428,7 @@ fun ExpandableFilter(
                             )
                             Text(
                                 text = option,
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.padding(start = 5.dp)
                             )
                         }
                     }

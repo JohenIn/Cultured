@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,13 +27,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -83,132 +90,151 @@ fun ArtworkDetails(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // 이미지 영역 (AsyncImage로 Firestore의 imageUrl 사용)
-        Box(
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp, end = 10.dp)
-                .heightIn(max = screenHeight / 3)
-                .clip(RoundedCornerShape(10.dp))
-                .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                    shape = RoundedCornerShape(10.dp)
-                )
-        ) {
-            AsyncImage(
-                model = artwork!!.imageUrl,
-                contentDescription = "Image of the art",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit // 이미지 비율에 맞춰 채우기
-            )
-        }
-        // 작품 정보 영역
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .height(IntrinsicSize.Max),
-        ) {
+    // 이미지 사이즈 관련 상태
+    val maxImageSize = screenHeight / 3
+    val minImageSize = screenHeight / 9
+    var currentImageSize by remember { mutableStateOf(maxImageSize) }
+    var imageScale by remember { mutableFloatStateOf(1f) }
 
-            Text(
-                text = artwork!!.title,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    text = artwork!!.artist_name,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "(${artwork!!.artist_birthYear}-${artwork!!.artist_deathYear}, ${artwork!!.artist_nationality})",
-                    fontSize = 16.sp
+
+    // 스크롤에 따른 이미지 크기 조절
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val delta = available.y
+                val previousSize = currentImageSize
+                currentImageSize = (currentImageSize + delta.dp).coerceIn(minImageSize, maxImageSize)
+                val consumed = currentImageSize - previousSize
+                imageScale = currentImageSize / maxImageSize
+                return Offset(0f, consumed.value)
+            }
+        }
+    }
+
+    // 전체 화면에 scroll 및 nestedScroll 적용
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(nestedScrollConnection)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // 이미지 영역
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(currentImageSize)
+                    .padding(horizontal = 10.dp, vertical = 10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(width = 1.dp, color = Color.LightGray, shape = RoundedCornerShape(10.dp))
+            ) {
+                AsyncImage(
+                    model = artwork!!.imageUrl,
+                    contentDescription = "Image of the art",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                        },
+                    contentScale = ContentScale.Fit
                 )
             }
-            Text(text = artwork!!.material, fontSize = 16.sp)
-            Text(text = artwork!!.productionYear, fontSize = 16.sp)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            Text("Department", fontSize = 16.sp, color = Color.Gray)
-            Text(text = artwork!!.artType, fontSize = 16.sp)
-            Text("Medium", fontSize = 16.sp, color = Color.Gray)
-            Text(text = artwork!!.medium, fontSize = 16.sp)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text("Location", fontSize = 16.sp, color = Color.Gray)
-            Row(modifier = Modifier.fillMaxWidth()) {
+            // 작품 정보 영역
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
                 Text(
-                    text = artwork!!.location_museum,
-                    fontSize = 16.sp,
+                    text = artwork!!.title,
+                    fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
-                Text(
-                    text = ", ${artwork!!.location_city}, ${artwork!!.location_country}",
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(text = favoriteCount.toString(), fontSize = 14.sp)
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = if (isFavorited) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable {
-                            if (currentUser == null) {
-                                navController.navigate("login")
-                            } else {
-                                toggleFavorite(artwork!!, currentUser.uid) { newState, newCount ->
-                                    isFavorited = newState
-                                    favoriteCount = newCount
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = artwork!!.artist_name,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "(${artwork!!.artist_birthYear}-${artwork!!.artist_deathYear}, ${artwork!!.artist_nationality})",
+                        fontSize = 16.sp
+                    )
+                }
+                Text(text = artwork!!.material, fontSize = 16.sp)
+                Text(text = artwork!!.productionYear, fontSize = 16.sp)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text("Department", fontSize = 16.sp, color = Color.Gray)
+                Text(text = artwork!!.artType, fontSize = 16.sp)
+                Text("Medium", fontSize = 16.sp, color = Color.Gray)
+                Text(text = artwork!!.medium, fontSize = 16.sp)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text("Location", fontSize = 16.sp, color = Color.Gray)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = artwork!!.location_museum,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Text(
+                        text = ", ${artwork!!.location_city}, ${artwork!!.location_country}",
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(text = favoriteCount.toString(), fontSize = 14.sp)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = if (isFavorited) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = Color.Red,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable {
+                                if (currentUser == null) {
+                                    navController.navigate("login")
+                                } else {
+                                    toggleFavorite(artwork, currentUser.uid) { newState, newCount ->
+                                        isFavorited = newState
+                                        favoriteCount = newCount
+                                    }
                                 }
                             }
-                        }
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Outlined.Share,
-                    contentDescription = "Share",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
-                )
-
-
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Outlined.Share,
+                        contentDescription = "Share",
+                        tint = Color.Black,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
-
-        }     // 구분선
-        HorizontalDivider(
-            color = Color.LightGray,
-            modifier = Modifier.padding(horizontal = 15.dp)
-        )
-
-        // 설명 영역 (스크롤 가능)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 10.dp)
-                .weight(1f)
-        ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = artwork!!.description,
-                fontSize = 16.sp,
-                lineHeight = 24.sp
+            // 구분선
+            HorizontalDivider(
+                color = Color.LightGray,
+                modifier = Modifier.padding(horizontal = 15.dp)
             )
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-        if (showAds) {
-            AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
-        }
+            // 설명 영역 (전체 스크롤 영역에 포함됨)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
+                    .padding(bottom = 20.dp)
+            ) {
+                Text(
+                    text = artwork!!.description,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp
+                )
+            }
+            }
+            if (showAds) {
+                AdsSection(modifier = Modifier.align(Alignment.BottomCenter))
+            }
     }
 }
 
@@ -253,5 +279,97 @@ fun toggleFavorite(
     }.addOnFailureListener { exception ->
         // 오류 발생 시 기본 상태 반환(변경하지 않음)
         onResult(false, 0)
+    }
+}
+
+@Composable
+fun ArtworksCard(
+    navController: NavController,
+    artwork: Artwork
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .clip(RoundedCornerShape(10.dp))
+            .padding(horizontal = 20.dp)
+            .border(
+                width = 0.5.dp,
+                color = Color(0xFFD9D9D9),
+                shape = RoundedCornerShape(10.dp)
+            )
+            .clickable {
+                navController.navigate("artworkInformation/${artwork.document}")
+            }
+    ) {
+        // 이미지 영역: 전체 너비의 50%를 차지, 높이는 텍스트 영역에 맞춰짐
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .drawBehind {
+                    val strokeWidth = 0.5.dp.toPx()
+                    // 오른쪽 경계에 선 그리기
+                    drawLine(
+                        color = Color(0xFFD9D9D9),
+                        start = Offset(x = size.width + strokeWidth, y = 0f),
+                        end = Offset(
+                            x = size.width + strokeWidth,
+                            y = size.height
+                        ),
+                        strokeWidth = strokeWidth
+                    )
+                }
+        ) {
+            AsyncImage(
+                model = artwork.imageUrl,
+                contentDescription = artwork.title,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 10.dp,
+                            topEnd = 0.dp,
+                            bottomEnd = 0.dp,
+                            bottomStart = 10.dp
+                        )
+                    ),
+                contentScale = ContentScale.Fit // 원본 비율을 유지하며 최대한 꽉 채움
+            )
+        }
+        // 텍스트 영역: 나머지 50%를 차지하며, 텍스트가 줄바꿈될 경우 Row의 높이가 이에 맞게 증가됨
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 15.dp, top = 15.dp)
+        ) {
+            Text(
+                text = artwork.title,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.Black
+            )
+            Text(
+                text = artwork.artist_name,
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+            Text(
+                text = artwork.artType,
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+            Text(
+                text = artwork.medium,
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "${artwork.location_museum}, ${artwork.location_city}, ${artwork.location_country}",
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+        }
     }
 }
