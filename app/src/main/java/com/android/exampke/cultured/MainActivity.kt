@@ -4,15 +4,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.android.exampke.cultured.Screen.ArtworkInformationScreen
 import com.android.exampke.cultured.Screen.FavoritesScreen
@@ -37,9 +42,19 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {// NavController 생성
                     val navController = rememberNavController()
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentRoute = navBackStackEntry?.destination?.route
+
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
-                        bottomBar = { BottomNavBar(navController = navController) }
+                        bottomBar = {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                if (currentRoute != "today") {
+                                    AdsSection(modifier = Modifier.fillMaxWidth(0.95f))
+                                }
+                                BottomNavBar(navController = navController)
+                            }
+                        }
                     ) { innerPadding ->
                         NavHost(
                             navController = navController,

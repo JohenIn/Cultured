@@ -1,16 +1,13 @@
 package com.android.exampke.cultured.Screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,18 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
 import com.android.exampke.cultured.Artwork
-import com.android.exampke.cultured.R
 import com.android.exampke.cultured.ui.theme.ArtworksCard
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -345,7 +335,6 @@ fun FavoritesScreen(navController: NavController) {
                 }
             }
         }
-        AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
     }
 }
 
@@ -406,8 +395,10 @@ fun ExpandableFilter(
                 .border(
                     width = 0.5.dp,
                     color = Color(0xFF777777),
-                    shape = RoundedCornerShape(bottomEnd = 10.dp,
-                        bottomStart = 10.dp)
+                    shape = RoundedCornerShape(
+                        bottomEnd = 10.dp,
+                        bottomStart = 10.dp
+                    )
                 )
         ) {
             options.forEach { option ->

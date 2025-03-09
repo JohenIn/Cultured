@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.android.exampke.cultured.Artwork
-import com.android.exampke.cultured.Screen.AdsSection
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -61,7 +60,6 @@ import kotlinx.coroutines.tasks.await
 fun ArtworkDetails(
     screenHeight: Dp,
     artwork: Artwork?,
-    showAds: Boolean = true,
     navController: NavController
 ) {
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -103,7 +101,8 @@ fun ArtworkDetails(
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
                 val previousSize = currentImageSize
-                currentImageSize = (currentImageSize + delta.dp).coerceIn(minImageSize, maxImageSize)
+                currentImageSize =
+                    (currentImageSize + delta.dp).coerceIn(minImageSize, maxImageSize)
                 val consumed = currentImageSize - previousSize
                 imageScale = currentImageSize / maxImageSize
                 return Offset(0f, consumed.value)
@@ -126,7 +125,11 @@ fun ArtworkDetails(
                     .height(currentImageSize)
                     .padding(horizontal = 10.dp, vertical = 10.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .border(width = 1.dp, color = Color.LightGray, shape = RoundedCornerShape(10.dp))
+                    .border(
+                        width = 1.dp,
+                        color = Color.LightGray,
+                        shape = RoundedCornerShape(10.dp)
+                    )
             ) {
                 AsyncImage(
                     model = artwork!!.imageUrl,
@@ -231,10 +234,7 @@ fun ArtworkDetails(
                     lineHeight = 24.sp
                 )
             }
-            }
-            if (showAds) {
-                AdsSection(modifier = Modifier.align(Alignment.BottomCenter))
-            }
+        }
     }
 }
 

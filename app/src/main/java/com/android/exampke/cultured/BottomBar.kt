@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,11 +27,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.android.exampke.cultured.Screen.getAdaptiveAdSize
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 
 // 네비게이션 아이템 모델 정의
 data class NavItem(val route: String, val label: String, val icon: ImageVector)
@@ -96,4 +103,55 @@ fun BottomNavBar(navController: NavController) {
             }
         }
     }
+}
+
+//하단 광고 설정
+@Composable
+fun AdsSection(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
+    // AndroidView를 사용해 기존 View(AdView)를 Compose에 삽입
+    AndroidView(
+        modifier = modifier
+            .fillMaxWidth(0.95f)
+            .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
+            .border(0.2.dp, Color.LightGray, RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
+            .height(60.dp),
+        factory = { ctx ->
+            // AdView 생성
+            val adView = AdView(ctx).apply {
+                adUnitId = "ca-app-pub-3940256099942544/9214589741" // 실제 광고 단위 ID로 교체
+                setAdSize(getAdaptiveAdSize(ctx))
+                adListener = object : AdListener() {
+                    override fun onAdClicked() {
+                        // 광고 클릭 시 동작
+                    }
+
+                    override fun onAdClosed() {
+                        // 광고 닫힐 때 동작
+                    }
+
+                    override fun onAdFailedToLoad(adError: com.google.android.gms.ads.LoadAdError) {
+                        // 광고 로딩 실패 시 동작
+                    }
+
+                    override fun onAdImpression() {
+                        // 광고 임프레션 시 동작
+                    }
+
+                    override fun onAdLoaded() {
+                        // 광고 로드 완료 시 동작
+                    }
+
+                    override fun onAdOpened() {
+                        // 광고 열릴 때 동작
+                    }
+                }
+            }
+            // 광고 요청 생성 및 로드
+            val adRequest = AdRequest.Builder().build()
+            adView.loadAd(adRequest)
+            adView
+        }
+    )
 }

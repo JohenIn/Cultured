@@ -23,7 +23,6 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,20 +39,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.android.exampke.cultured.repository.rememberUniqueThemes
 import com.google.common.reflect.TypeToken
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -83,11 +79,14 @@ fun NavigateScreen(navController: NavController) {
                 .weight(1f)
         ) {
             themes.forEach { theme ->
-                ThemeBox(theme = theme, imageUrl = themeImageMap[theme], navController = navController)
+                ThemeBox(
+                    theme = theme,
+                    imageUrl = themeImageMap[theme],
+                    navController = navController
+                )
             }
             Spacer(modifier = Modifier.height(20.dp))
         }
-        AdsSection(modifier = Modifier.align(Alignment.CenterHorizontally))
     }
 }
 
