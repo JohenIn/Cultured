@@ -90,7 +90,7 @@ fun ArtworkDetails(
 
     // 이미지 사이즈 관련 상태
     val maxImageSize = screenHeight / 3
-    val minImageSize = screenHeight / 9
+    val minImageSize = 0.dp
     var currentImageSize by remember { mutableStateOf(maxImageSize) }
     var imageScale by remember { mutableFloatStateOf(1f) }
 
@@ -138,7 +138,7 @@ fun ArtworkDetails(
                         .fillMaxSize()
                         .graphicsLayer {
                         },
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.FillHeight
                 )
             }
             // 작품 정보 영역
