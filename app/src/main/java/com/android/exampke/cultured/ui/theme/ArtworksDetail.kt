@@ -94,15 +94,29 @@ fun ArtworkDetails(
     var currentImageSize by remember { mutableStateOf(maxImageSize) }
     var imageScale by remember { mutableFloatStateOf(1f) }
 
+    // 스크롤 상태를 rememberScrollState로 관리 (이 값을 NestedScrollConnection에서 사용)
+    val scrollState = rememberScrollState()
 
     // 스크롤에 따른 이미지 크기 조절
-    val nestedScrollConnection = remember {
+    val nestedScrollConnection = remember(scrollState, currentImageSize) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
+
+                // 콘텐츠가 스크롤되지 않을 때 (maxValue==0) 음의 delta는 차단하고, 양의 delta는 허용합니다.
+                if (scrollState.maxValue == 0 && delta < 0f) {
+                    return Offset.Zero
+                }
+
+                // 이미지가 이미 최소 크기에 있고 음의 delta가 발생하거나,
+                // 최대 크기에 있고 양의 delta가 발생하면 차단합니다.
+                if ((currentImageSize == minImageSize && delta < 0f) ||
+                    (currentImageSize == maxImageSize && delta > 0f)) {
+                    return Offset.Zero
+                }
+
                 val previousSize = currentImageSize
-                currentImageSize =
-                    (currentImageSize + delta.dp).coerceIn(minImageSize, maxImageSize)
+                currentImageSize = (currentImageSize + delta.dp).coerceIn(minImageSize, maxImageSize)
                 val consumed = currentImageSize - previousSize
                 imageScale = currentImageSize / maxImageSize
                 return Offset(0f, consumed.value)
@@ -115,7 +129,7 @@ fun ArtworkDetails(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // 이미지 영역
