@@ -6,11 +6,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -44,6 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.android.exampke.cultured.Artwork
+import com.android.exampke.cultured.repository.rememberArtworks
 import com.google.common.reflect.TypeToken
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -56,36 +62,84 @@ import java.util.Date
 import java.util.Locale
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigateScreen(navController: NavController) {
-    // 캐싱된 테마별 대표 이미지 Map 구독
-    val themeImageMapState = rememberThemeRepresentativeImages()
-    val themeImageMap = themeImageMapState.value
-    // Map의 키가 테마 목록이 됨
+    // 1) 전체 artworks 구독
+    val artworks by rememberArtworks()
+
+    // 2) 테마별 대표 이미지 구독
+    val themeImageMap by rememberThemeRepresentativeImages()
     val themes = themeImageMap.keys.toList()
+
+    // 3) 검색 상태
+    var query by remember { mutableStateOf("") }
+    var active by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         PageTitle("Navigate")
 
-        //Firebase는 검색이 용이하지 않으므로 다른 대안을 생각해보아야한다.
-        //CustomSearchBar()
-
-        val rememberScrollState = rememberScrollState()
-        Column(
+        // 4) SearchBar
+        SearchBar(
+            query = query,
+            onQueryChange = { query = it },
+            onSearch = { /* 아이콘 눌렀을 때도 동일하게 active 유지 */ },
+            active = active,
+            onActiveChange = { active = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalColumnScrollbar(rememberScrollState)
-                .verticalScroll(rememberScrollState)
-                .weight(1f)
+                .padding(horizontal = 10.dp),
+            placeholder = { Text("Artist, Title, Art Type") },
+            trailingIcon = {
+                Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF727272))
+            },
+            colors = SearchBarDefaults.colors(
+                containerColor = Color(0xFFEAEAEA),
+            )
         ) {
-            themes.forEach { theme ->
-                ThemeBox(
-                    theme = theme,
-                    imageUrl = themeImageMap[theme],
-                    navController = navController
-                )
+            // 5) content 슬롯에만 검색 결과를 그림
+            if (query.isNotBlank()) {
+                val results = artworks.filter { art ->
+                    art.title.contains(query, ignoreCase = true) ||
+                            art.artist_name.contains(query, ignoreCase = true) ||
+                            art.artType.contains(query, ignoreCase = true)
+                }
+                // 결과가 없으면 빈 영역(공백)
+                if (results.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 200.dp)  // 필요에 따라 max 높이 지정
+                    ) {
+                        items(results) { art ->
+                            SearchResultItem(art, navController)
+                        }
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(20.dp))
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // 6) 검색이 활성화되지 않았을 때만 테마 박스 표시
+        if (!active) {
+            val scroll = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(scroll)
+                    .verticalColumnScrollbar(scroll)
+            ) {
+                themes.forEach { theme ->
+                    ThemeBox(
+                        theme = theme,
+                        imageUrl = themeImageMap[theme],
+                        navController = navController
+                    )
+                }
+                Spacer(Modifier.height(20.dp))
+            }
         }
     }
 }
@@ -102,41 +156,28 @@ fun PageTitle(title: String, fontSize: TextUnit = 48.sp) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomSearchBar() {
-    var query by remember { mutableStateOf("") }
-    var active by remember { mutableStateOf(false) }
-
-    SearchBar(
-        query = query,
-        onQueryChange = { query = it },
-        onSearch = {
-            // 검색 동작 처리
-        },
-        active = active,
-        onActiveChange = { active = it },
+private fun SearchResultItem(art: Artwork, navController: NavController) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-        placeholder = {
-            Text("Artist, Title, Art Type or Whatever you want")
-        },
-        trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search Icon",
-                tint = Color(0xFF727272)
-            )
-        },
-        colors = SearchBarDefaults.colors(
-            containerColor = Color(0xFFEAEAEA)
-        )
+            .clickable { navController.navigate("artworkInformation/${art.document}") }
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // 여기에 검색 제안 등 추가 콘텐츠를 넣을 수 있습니다.
+        AsyncImage(
+            model = art.imageUrl,
+            contentDescription = art.title,
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop
+        )
+        Column {
+            Text(art.title, fontWeight = FontWeight.Bold)
+            Text(art.artist_name, fontSize = 12.sp, color = Color.Gray)
+        }
     }
 }
-
 @Composable
 fun rememberThemeRepresentativeImages(): State<Map<String, String>> {
     val themeImageMapState = remember { mutableStateOf<Map<String, String>>(emptyMap()) }
