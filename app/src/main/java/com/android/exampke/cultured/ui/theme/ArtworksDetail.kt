@@ -53,13 +53,15 @@ import com.android.exampke.cultured.Artwork
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
 @Composable
 fun ArtworkDetails(
     screenHeight: Dp,
-    artwork: Artwork?,
+    artwork: Artwork,
     navController: NavController
 ) {
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -68,26 +70,39 @@ fun ArtworkDetails(
     val context = LocalContext.current
 
     // 초기 즐겨찾기 상태 및 개수를 Firestore에서 가져옵니다.
-    LaunchedEffect(artwork) {
-        if (artwork != null) {
-            val db = Firebase.firestore
+    LaunchedEffect(artwork, currentUser) {
+        val db = Firebase.firestore
 
-            // 전체 즐겨찾기 수는 항상 불러옴
-            val countSnapshot = db.collection("favorites")
+        // 1) 전체 즐겨찾기 수 (네트워크/오프라인 무시하고 0으로 초기화)
+        favoriteCount = try {
+            db.collection("favorites")
                 .whereEqualTo("artworkId", artwork.document)
                 .get()
                 .await()
-            favoriteCount = countSnapshot.size().toLong()
+                .size()
+                .toLong()
+        } catch (e: FirebaseFirestoreException) {
+            if (e.code == FirebaseFirestoreException.Code.UNAVAILABLE) {
+                0L
+            } else {
+                throw e
+            }
+        }
 
-            // 현재 사용자가 로그인한 경우에만 개인 즐겨찾기 상태를 불러옴
-            if (currentUser != null) {
-                val favDocId = "${artwork.document}_${currentUser.uid}"
-                val favDoc = db.collection("favorites").document(favDocId).get().await()
-                isFavorited = favDoc.exists()
+        // 2) 로그인 유저 즐겨찾기 상태 (오프라인시 false)
+        if (currentUser != null) {
+            val favDocId = "${artwork.document}_${currentUser.uid}"
+            isFavorited = try {
+                db.collection("favorites")
+                    .document(favDocId)
+                    .get(Source.CACHE)
+                    .await()
+                    .exists()
+            } catch (_: Exception) {
+                false
             }
         }
     }
-
     // 이미지 사이즈 관련 상태
     val maxImageSize = screenHeight / 3
     val minImageSize = 0.dp
