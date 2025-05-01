@@ -175,6 +175,7 @@ private fun SearchResultItem(art: Artwork, navController: NavController) {
         Column {
             Text(art.title, fontWeight = FontWeight.Bold)
             Text(art.artist_name, fontSize = 12.sp, color = Color.Gray)
+
         }
     }
 }
