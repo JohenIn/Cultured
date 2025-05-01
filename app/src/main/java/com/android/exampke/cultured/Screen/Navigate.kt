@@ -179,6 +179,7 @@ private fun SearchResultItem(art: Artwork, navController: NavController) {
         }
     }
 }
+
 @Composable
 fun rememberThemeRepresentativeImages(): State<Map<String, String>> {
     val themeImageMapState = remember { mutableStateOf<Map<String, String>>(emptyMap()) }

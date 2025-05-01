@@ -39,9 +39,11 @@ fun ThemeArtworksScreen(theme: String, navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        LazyColumn(modifier = Modifier
-            .fillMaxSize()
-            .weight(1f)) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
             items(artworks) { artwork ->
                 ArtworksCard(navController, artwork)
             }

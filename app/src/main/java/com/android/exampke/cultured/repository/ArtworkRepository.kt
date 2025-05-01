@@ -35,29 +35,3 @@ fun rememberArtworks(): State<List<Artwork>> {
     }
     return artworksState
 }
-
-@Composable
-fun rememberUniqueThemes(): State<List<String>> {
-    val db = Firebase.firestore
-    val themesState = remember { mutableStateOf<List<String>>(emptyList()) }
-
-    DisposableEffect(Unit) {
-        val registration = db.collection("artworks")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    // 에러 처리
-                    return@addSnapshotListener
-                }
-                snapshot?.let {
-                    val themes = it.documents.mapNotNull { doc ->
-                        doc.getString("theme")
-                    }.distinct()
-                    themesState.value = themes
-                }
-            }
-        onDispose {
-            registration.remove()
-        }
-    }
-    return themesState
-}

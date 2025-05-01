@@ -18,7 +18,8 @@ suspend fun getDailyArtworkFromList(artworks: List<Artwork>, context: Context): 
             // 만약 캐시된 목록에 없다면 새로 랜덤 선택
             val randomArtwork = artworks.randomOrNull()
             randomArtwork?.also {
-                prefs.edit().putString("artworkId", it.document).putString("date", todayDate).apply()
+                prefs.edit().putString("artworkId", it.document).putString("date", todayDate)
+                    .apply()
             }
         }
     } else {
